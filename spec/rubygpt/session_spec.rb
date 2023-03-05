@@ -54,4 +54,24 @@ RSpec.describe Rubygpt::Session do
       end
     end
   end
+
+  describe '#new_by_format' do
+    context 'when format is repl' do
+      it "returns a repl session" do
+        expect(described_class.new_by_format(path, :repl)).to be_a Rubygpt::Session::Repl
+      end
+    end
+
+    context 'when format is block' do
+      it "returns a block session" do
+        expect(described_class.new_by_format(path, :block)).to be_a Rubygpt::Session::Block
+      end
+    end
+
+    context 'when format is unknown' do
+      it "raises an error" do
+        expect { described_class.new_by_format(path, :unknown) }.to raise_error RuntimeError
+      end
+    end
+  end
 end

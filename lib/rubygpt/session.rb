@@ -7,6 +7,17 @@ class Rubygpt::Session
     @messages = []
   end
 
+  def self.new_by_format(path, format)
+    case format
+    when :repl
+      Rubygpt::Session::Repl.new(path)
+    when :block
+      Rubygpt::Session::Block.new(path)
+    else
+      raise "Unknown format: #{format}"
+    end
+  end
+
   def repl?
     format == :repl
   end
