@@ -5,4 +5,11 @@ class Rubygpt::Message
     @role = role
     @content = content
   end
+
+  def to_h
+    {
+      role: role,
+      content: content,
+    }
+  end
 end

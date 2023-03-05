@@ -15,6 +15,7 @@ module Rubygpt
     def initialize(api_key = ENV['OPENAI_API_KEY'], session_path: nil, format: :repl, output: true)
       @client = OpenAI::Client.new(access_token: api_key)
       @format = format
+      @output = output
 
       prepare_session(session_path)
       greet
@@ -46,15 +47,26 @@ module Rubygpt
       end
     end
 
+    def process
+      last_message = session.messages.last
+
+      if last_message.role == 'user'
+        input = last_message.content.gsub(session.user_prompt, '').strip.chomp
+        query_assistant(input)
+        save
+      end
+    end
+
     private
 
     def query_assistant(input)
       print_message 'Thinking...', color: :yellow
 
+      messages = session.messages.map(&:to_h)
       response = @client.chat(
         parameters: {
           model: "gpt-3.5-turbo",
-          messages: session.messages
+          messages: messages
         })
       output = response.dig("choices", 0, "message", "content").strip
       output_markdown = TTY::Markdown.parse(output)
@@ -74,6 +86,7 @@ module Rubygpt
                       end
 
       @session = Rubygpt::Session.new_by_format(path, @format)
+      @session.load
     end
 
     def greet
@@ -88,10 +101,11 @@ module Rubygpt
       input = File.read(filepath)
       File.delete(filepath)
 
-      session.add_message(role: 'user', content: input)
-
       input_markdown = TTY::Markdown.parse(input)
       print_message input_markdown
+
+      session.add_message(role: 'user', content: input)
+      query_assistant(input)
     end
 
     def copy
@@ -124,9 +138,9 @@ module Rubygpt
         markdown = TTY::Markdown.parse(message.content).strip.chomp
 
         if message.role == 'user'
-          "#{user_prompt.colorize(:red)}#{markdown}"
+          "#{session.user_prompt.colorize(:red)}#{markdown}"
         else
-          assistant_prompt.colorize(:green) + "\n" + markdown
+          session.assistant_prompt.colorize(:green) + "\n" + markdown
         end
       end.join("\n\n")
 
@@ -145,7 +159,7 @@ module Rubygpt
     end
 
     def output?
-      @output
+      @output == true
     end
   end
 end
