@@ -1,20 +1,20 @@
 RSpec.describe Rubygpt::Chat do
-  let(:api_key) { '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' }
+  let(:api_key) { "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" }
   subject(:chat) { described_class.new api_key, output: false }
 
-  describe '#process_input' do
-    context 'when input is empty' do
-      let(:input) { '' }
+  describe "#process_input" do
+    context "when input is empty" do
+      let(:input) { "" }
 
       before { chat.process_input input }
 
-      it 'does nothing' do
+      it "does nothing" do
         expect(chat.session.messages).to be_empty
       end
     end
 
-    context 'when input is exit' do
-      let(:input) { 'exit' }
+    context "when input is exit" do
+      let(:input) { "exit" }
 
       before do
         allow(chat).to receive(:exit)
@@ -27,8 +27,8 @@ RSpec.describe Rubygpt::Chat do
       end
     end
 
-    context 'when input is new' do
-      let(:input) { 'new' }
+    context "when input is new" do
+      let(:input) { "new" }
 
       before { chat.process_input input }
 
@@ -37,8 +37,8 @@ RSpec.describe Rubygpt::Chat do
       end
     end
 
-    context 'when input is save' do
-      let(:input) { 'save' }
+    context "when input is save" do
+      let(:input) { "save" }
 
       before do
         allow(chat).to receive(:save).and_return(true)
@@ -51,8 +51,8 @@ RSpec.describe Rubygpt::Chat do
       end
     end
 
-    context 'when input is copy' do
-      let(:input) { 'copy' }
+    context "when input is copy" do
+      let(:input) { "copy" }
 
       before do
         allow(chat).to receive(:copy).and_return(true)
@@ -65,8 +65,8 @@ RSpec.describe Rubygpt::Chat do
       end
     end
 
-    context 'when i put is history' do
-      let(:input) { 'history' }
+    context "when i put is history" do
+      let(:input) { "history" }
 
       before do
         allow(chat).to receive(:history).and_return(true)
@@ -79,8 +79,8 @@ RSpec.describe Rubygpt::Chat do
       end
     end
 
-    context 'when input is clear' do
-      let(:input) { 'clear' }
+    context "when input is clear" do
+      let(:input) { "clear" }
 
       before do
         allow(chat).to receive(:clear).and_return(true)
@@ -93,8 +93,8 @@ RSpec.describe Rubygpt::Chat do
       end
     end
 
-    context 'when input is debug' do
-      let(:input) { 'debug' }
+    context "when input is debug" do
+      let(:input) { "debug" }
 
       before do
         allow(chat).to receive(:debug).and_return(true)
@@ -107,16 +107,16 @@ RSpec.describe Rubygpt::Chat do
       end
     end
 
-    context 'when input is not a command' do
-      let(:input) { 'hello' }
+    context "when input is not a command" do
+      let(:input) { "hello" }
 
-      before { VCR.use_cassette('hello') { chat.process_input input } }
+      before { VCR.use_cassette("hello") { chat.process_input input } }
 
       it "keeps messages" do
-        expect(chat.session.messages[0].role).to eq 'user'
-        expect(chat.session.messages[0].content).to include 'hello'
-        expect(chat.session.messages[1].role).to eq 'assistant'
-        expect(chat.session.messages[1].content).to include('How can I assist you today?')
+        expect(chat.session.messages[0].role).to eq "user"
+        expect(chat.session.messages[0].content).to include "hello"
+        expect(chat.session.messages[1].role).to eq "assistant"
+        expect(chat.session.messages[1].content).to include("How can I assist you today?")
       end
     end
   end

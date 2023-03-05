@@ -2,18 +2,18 @@ class Rubygpt::Session::Block < Rubygpt::Session
   def load
     return reset_messages unless File.exist?(path)
 
-    role = 'user'
-    content = ''
+    role = "user"
+    content = ""
 
     File.readlines(path).each do |line|
-      if line.include?('<!-- block assistant -->')
+      if line.include?("<!-- block assistant -->")
         add_message(role: role, content: content)
-        role = 'assistant'
-        content = ''
-      elsif line.include?('<!-- endblock -->')
+        role = "assistant"
+        content = ""
+      elsif line.include?("<!-- endblock -->")
         add_message(role: role, content: content)
-        role = 'user'
-        content = ''
+        role = "user"
+        content = ""
       else
         content += line
       end
@@ -25,11 +25,11 @@ class Rubygpt::Session::Block < Rubygpt::Session
   end
 
   def render
-    text = ''
+    text = ""
     assistant_block = false
 
     messages.each do |message|
-      if message.role == 'assistant'
+      if message.role == "assistant"
         unless assistant_block
           text += "\n<!-- block assistant -->\n"
           assistant_block = true

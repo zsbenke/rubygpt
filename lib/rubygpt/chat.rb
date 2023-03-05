@@ -1,18 +1,18 @@
-require 'openai'
-require 'colorize'
-require 'readline'
-require 'securerandom'
-require 'date'
-require 'tty-markdown'
-require 'optparse'
-require 'clipboard'
-require 'awesome_print'
+require "openai"
+require "colorize"
+require "readline"
+require "securerandom"
+require "date"
+require "tty-markdown"
+require "optparse"
+require "clipboard"
+require "awesome_print"
 
 module Rubygpt
   class Chat
     attr_reader :session
 
-    def initialize(api_key = ENV['OPENAI_API_KEY'], session_path: nil, format: :repl, output: true)
+    def initialize(api_key = ENV["OPENAI_API_KEY"], session_path: nil, format: :repl, output: true)
       @client = OpenAI::Client.new(access_token: api_key)
       @format = format
       @output = output
@@ -25,24 +25,24 @@ module Rubygpt
       return if input.empty?
 
       case input
-      when 'exit'
+      when "exit"
         exit
-      when 'new'
+      when "new"
         new
-      when 'save'
+      when "save"
         save
-      when 'copy'
+      when "copy"
         copy
-      when 'history'
+      when "history"
         history
-      when 'clear'
+      when "clear"
         clear
-      when 'debug'
+      when "debug"
         debug
-      when 'edit'
+      when "edit"
         edit
       else
-        session.add_message(role: 'user', content: input)
+        session.add_message(role: "user", content: input)
         query_assistant(input)
       end
     end
@@ -50,17 +50,29 @@ module Rubygpt
     def process
       last_message = session.messages.last
 
-      if last_message.role == 'user'
-        input = last_message.content.gsub(session.user_prompt, '').strip.chomp
+      if last_message.role == "user"
+        input = last_message.content.gsub(session.user_prompt, "").strip.chomp
         query_assistant(input)
         save
       end
     end
 
+    def convert
+      convert_to_format = @format == :repl ? :block : :repl
+      new_session = Rubygpt::Session.new_by_format(session.path, convert_to_format)
+
+      session.messages.each do |message|
+        new_session.add_message(role: message.role, content: message.content)
+      end
+      @session = new_session
+
+      save
+    end
+
     private
 
     def query_assistant(input)
-      print_message 'Thinking...', color: :yellow
+      print_message "Thinking...", color: :yellow
 
       messages = session.messages.map(&:to_h)
       response = @client.chat(
@@ -74,7 +86,7 @@ module Rubygpt
       print_message session.assistant_prompt, color: :green, bold: true
       print_message output_markdown
 
-      session.add_message(role: 'assistant', content: output)
+      session.add_message(role: "assistant", content: output)
     end
 
     def prepare_session(path)
@@ -82,7 +94,7 @@ module Rubygpt
                         path
                       else
                         current_time = DateTime.now.strftime("%Y-%m-%d_%H-%M-%S")
-                        File.join(Dir.home, 'Documents', 'Chats', "Chat-#{current_time}.md")
+                        File.join(Dir.home, "Documents", "Chats", "Chat-#{current_time}.md")
                       end
 
       @session = Rubygpt::Session.new_by_format(path, @format)
@@ -104,7 +116,7 @@ module Rubygpt
       input_markdown = TTY::Markdown.parse(input)
       print_message input_markdown
 
-      session.add_message(role: 'user', content: input)
+      session.add_message(role: "user", content: input)
       query_assistant(input)
     end
 
@@ -124,11 +136,11 @@ module Rubygpt
       prepare_session(nil)
       clear if output?
 
-      print_message 'New session started', color: :green
+      print_message "New session started", color: :green
     end
 
     def clear
-      system('clear')
+      system("clear")
     end
 
     def history
@@ -137,7 +149,7 @@ module Rubygpt
       lines = session.messages.map do |message|
         markdown = TTY::Markdown.parse(message.content).strip.chomp
 
-        if message.role == 'user'
+        if message.role == "user"
           "#{session.user_prompt.colorize(:red)}#{markdown}"
         else
           session.assistant_prompt.colorize(:green) + "\n" + markdown

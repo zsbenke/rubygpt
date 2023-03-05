@@ -1,4 +1,4 @@
-require 'optparse'
+require "optparse"
 
 require_relative "rubygpt/version"
 require_relative "rubygpt/message"
@@ -20,28 +20,43 @@ module Rubygpt
         options[:session_path] = File.expand_path(path.chomp)
       end
 
-      opts.on("-f", "--format FORMAT", "Format of the context file") do |format|
-        options[:format] = format.chomp
+      opts.on("-c", "--convert PATH", "Convert a session file to a different format") do |path|
+        options[:convert] = File.expand_path(path.chomp)
       end
 
       opts.on("-p", "--process PATH", "Path to a file to process") do |path|
         options[:process_path] = File.expand_path(path.chomp)
       end
+
+      opts.on("-f", "--format FORMAT", "Format of the context file") do |format|
+        options[:format] = format.chomp
+      end
     end.parse!
+
 
     session_path = options[:session_path] if options[:session_path]
     process_path = options[:process_path] if options[:process_path]
+    convert = options[:convert] if options[:convert]
     format = options[:format] ? options[:format].to_sym : :repl
 
     if process_path
-      chat = Rubygpt::Chat.new(ENV['OPENAI_API_KEY'], session_path: process_path, format: format, output: false)
+      chat = Rubygpt::Chat.new(ENV["OPENAI_API_KEY"], session_path: process_path, format: format, output: false)
       chat.process
-    else
-      chat = Rubygpt::Chat.new(ENV['OPENAI_API_KEY'], session_path: session_path, format: format)
 
-      while buffer = Readline.readline(chat.session.user_prompt.colorize(:red), true)
-        chat.process_input(buffer)
-      end
+      return
+    end
+
+    if convert
+      chat = Rubygpt::Chat.new(ENV["OPENAI_API_KEY"], session_path: session_path, format: format, output: false)
+      chat.convert
+
+      return
+    end
+
+    chat = Rubygpt::Chat.new(ENV["OPENAI_API_KEY"], session_path: session_path, format: format)
+
+    while buffer = Readline.readline(chat.session.user_prompt.colorize(:red), true)
+      chat.process_input(buffer)
     end
   end
 end
