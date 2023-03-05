@@ -89,8 +89,6 @@ module Rubygpt
 
     private
 
-    Message = Struct.new(:role, :content)
-
     def output?
       @output
     end
@@ -239,7 +237,7 @@ module Rubygpt
       content.strip!
       content.chomp!
 
-      message = Message.new(role, content)
+      message = Message.new(role: role, content: content)
       @messages.append(message)
     end
   end
