@@ -31,7 +31,7 @@ module Rubygpt
 
     session_path = options[:session_path] if options[:session_path]
     process_path = options[:process_path] if options[:process_path]
-    format = options[:format] ? options[:format] : :repl
+    format = options[:format] ? options[:format].to_sym : :repl
 
     if process_path
       chat = Rubygpt::Chat.new(ENV['OPENAI_API_KEY'], session_path: process_path, format: format, output: false)
