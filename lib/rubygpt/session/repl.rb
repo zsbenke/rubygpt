@@ -1,5 +1,8 @@
 class Rubygpt::Session::Repl < Rubygpt::Session
+
   def load
+    return reset_messages unless File.exist?(path)
+
     current_message = { role: '', content: '' }
 
     File.readlines(path).each do |line|
@@ -27,15 +30,5 @@ class Rubygpt::Session::Repl < Rubygpt::Session
         "#{assistant_prompt}\n#{message.content.strip.chomp}"
       end
     end.join("\n\n")
-  end
-
-  private
-
-  def user_prompt
-    "ask> "
-  end
-
-  def assistant_prompt
-    "=> Response"
   end
 end

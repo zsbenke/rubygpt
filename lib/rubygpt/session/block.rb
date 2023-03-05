@@ -1,5 +1,7 @@
 class Rubygpt::Session::Block < Rubygpt::Session
   def load
+    return reset_messages unless File.exist?(path)
+
     role = 'user'
     content = ''
 

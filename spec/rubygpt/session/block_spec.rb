@@ -8,11 +8,21 @@ RSpec.describe Rubygpt::Session::Block do
   end
 
   describe '#load' do
-    it 'loads the session from a file' do
-      expect(session.messages[0].role).to eq 'user'
-      expect(session.messages[0].content).to eq 'Hello!'
-      expect(session.messages[1].role).to eq 'assistant'
-      expect(session.messages[1].content).to eq 'Hello, how can I assist you today?'
+    context 'when the file exists' do
+      it 'loads the session from a file' do
+        expect(session.messages[0].role).to eq 'user'
+        expect(session.messages[0].content).to eq 'Hello!'
+        expect(session.messages[1].role).to eq 'assistant'
+        expect(session.messages[1].content).to eq 'Hello, how can I assist you today?'
+      end
+    end
+
+    context 'when the file does not exist' do
+      let(:path) { 'does_not_exist.md' }
+
+      it 'sets messages to empty' do
+        expect(session.messages).to be_empty
+      end
     end
   end
 

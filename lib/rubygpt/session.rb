@@ -4,7 +4,8 @@ class Rubygpt::Session
   def initialize(path, format: :repl)
     @path = path
     @format = format
-    @messages = []
+
+    reset_messages
   end
 
   def self.new_by_format(path, format)
@@ -26,13 +27,23 @@ class Rubygpt::Session
     format == :block
   end
 
-  private
-
   def add_message(role:, content:)
     content.strip!
     content.chomp!
 
     message = Rubygpt::Message.new(role: role, content: content)
     @messages.append(message)
+  end
+
+  def reset_messages
+    @messages = []
+  end
+
+  def user_prompt
+    "ask> "
+  end
+
+  def assistant_prompt
+    "=> Response"
   end
 end
