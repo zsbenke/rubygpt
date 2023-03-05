@@ -25,6 +25,8 @@ module Rubygpt
       case input
       when ""
         handle_empty
+      when "help"
+        help
       when "exit"
         exit
       when "new"
@@ -112,7 +114,7 @@ module Rubygpt
     end
 
     def greet
-      print_message 'Welcome! Type "exit" to quit at any time.', color: :green
+      print_message 'Welcome! Type "help" to see available commands'
     end
 
     def handle_empty
@@ -123,6 +125,24 @@ module Rubygpt
       else
         print_message "Type 'history' to see the chat history.", color: :green
       end
+    end
+
+    def help
+      message = <<~HELP
+        Commands:
+          help - show this help
+          exit - exit the chat
+          new - start a new session
+          save - save the session to a file
+          copy - copy the path to the session file to the clipboard
+          reload - reload the session from the current session file
+          history - show the session history
+          clear - clear the screen
+          debug - show debug information
+          edit - open the $EDITOR to edit the current message before sending
+      HELP
+
+      print_message message
     end
 
     def edit
