@@ -69,6 +69,12 @@ module Rubygpt
       save
     end
 
+    def create
+      session.reset_messages
+      session.add_message(role: "user", content: "Write you request here...")
+      save
+    end
+
     private
 
     def query_assistant(input)

@@ -28,6 +28,10 @@ module Rubygpt
         options[:process_path] = File.expand_path(path.chomp)
       end
 
+      opts.on("-n", "--new", "Create a new session file in the default sessions path") do
+        options[:new] = true
+      end
+
       opts.on("-f", "--format FORMAT", "Set the format of the session file") do |format|
         options[:format] = format.chomp
       end
@@ -36,12 +40,14 @@ module Rubygpt
     session_path = options[:session_path] if options[:session_path]
     process_path = options[:process_path] if options[:process_path]
     convert = options[:convert] if options[:convert]
+    new = options[:new] if options[:new]
     format = options[:format] ? options[:format].to_sym : :repl
 
     if process_path
       chat = Rubygpt::Chat.new(ENV["OPENAI_API_KEY"], session_path: process_path, format: format, output: false)
       chat.process
 
+      puts chat.session.path
       return
     end
 
@@ -49,6 +55,15 @@ module Rubygpt
       chat = Rubygpt::Chat.new(ENV["OPENAI_API_KEY"], session_path: convert, format: format, output: false)
       chat.convert
 
+      puts chat.session.path
+      return
+    end
+
+    if new
+      chat = Rubygpt::Chat.new(ENV["OPENAI_API_KEY"], format: format, output: false)
+      chat.create
+
+      puts chat.session.path
       return
     end
 
