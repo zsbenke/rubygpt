@@ -96,12 +96,14 @@ module Rubygpt
     end
 
     def prepare_session(path)
+      default_path = File.expand_path(ENV["RUBYGPT_SESSION_PATH"] || ".")
+
       path = if path
-                        path
-                      else
-                        current_time = DateTime.now.strftime("%Y-%m-%d_%H-%M-%S")
-                        File.join(Dir.home, "Documents", "Chats", "Chat-#{current_time}.md")
-                      end
+               path
+             else
+               current_time = DateTime.now.strftime("%Y-%m-%d_%H-%M-%S")
+               File.join(default_path, "Chat-#{current_time}.md")
+             end
 
       @session = Rubygpt::Session.new_by_format(path, @format)
       @session.load
