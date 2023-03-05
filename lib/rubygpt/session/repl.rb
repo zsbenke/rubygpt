@@ -24,7 +24,7 @@ class Rubygpt::Session::Repl < Rubygpt::Session
 
   def render
     @messages.map do |message|
-      if message.role == "user"
+      if message.user_role?
         "#{user_prompt}#{message.content.strip.chomp}"
       else
         "#{assistant_prompt}\n#{message.content.strip.chomp}"

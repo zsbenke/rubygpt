@@ -12,4 +12,12 @@ class Rubygpt::Message
       content: content,
     }
   end
+
+  def user_role?
+    role == "user"
+  end
+
+  def assistant_role?
+    role == "assistant"
+  end
 end

@@ -22,9 +22,9 @@ module Rubygpt
     end
 
     def process_input(input)
-      return if input.empty?
-
       case input
+      when ""
+        handle_empty
       when "exit"
         exit
       when "new"
@@ -33,6 +33,8 @@ module Rubygpt
         save
       when "copy"
         copy
+      when "reload"
+        reload
       when "history"
         history
       when "clear"
@@ -50,7 +52,7 @@ module Rubygpt
     def process
       last_message = session.messages.last
 
-      if last_message.role == "user"
+      if last_message.user_role?
         input = last_message.content.gsub(session.user_prompt, "").strip.chomp
         query_assistant(input)
         save
@@ -113,6 +115,16 @@ module Rubygpt
       print_message 'Welcome! Type "exit" to quit at any time.', color: :green
     end
 
+    def handle_empty
+      if session.messages.empty?
+        print_message "Ask something or type 'help' for more information.", color: :green
+      elsif session.messages.last.user_role?
+        query_assistant(session.messages.last.content)
+      else
+        print_message "Type 'history' to see the chat history.", color: :green
+      end
+    end
+
     def edit
       filename = SecureRandom.hex
       filepath = "/tmp/#{filename}.md"
@@ -132,6 +144,13 @@ module Rubygpt
       Clipboard.copy(session.path)
 
       print_message "Copied path to the clipboard.", color: :green
+    end
+
+    def reload
+      session.reset_messages
+      session.load
+
+      print_message "Reloaded session", color: :green
     end
 
     def save
@@ -157,7 +176,7 @@ module Rubygpt
       lines = session.messages.map do |message|
         markdown = TTY::Markdown.parse(message.content).strip.chomp
 
-        if message.role == "user"
+        if message.user_role?
           "#{session.user_prompt.colorize(:red)}#{markdown}"
         else
           session.assistant_prompt.colorize(:green) + "\n" + markdown

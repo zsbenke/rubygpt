@@ -29,7 +29,7 @@ class Rubygpt::Session::Block < Rubygpt::Session
     assistant_block = false
 
     messages.each do |message|
-      if message.role == "assistant"
+      if message.assistant_role?
         unless assistant_block
           text += "\n<!-- block assistant -->\n"
           assistant_block = true
