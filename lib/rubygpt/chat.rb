@@ -75,7 +75,7 @@ module Rubygpt
 
     def create
       session.reset_messages
-      session.add_message(role: "user", content: "Write you request here...")
+      session.add_message(role: "user", content: "")
       save
     end
 
