@@ -105,7 +105,7 @@ module Rubygpt
       path = if path
                path
              else
-               current_time = DateTime.now.strftime("%Y-%m-%d_%H-%M-%S")
+               current_time = DateTime.now.strftime("%Y-%m-%d-%H-%M-%S")
                File.join(default_path, "#{current_time} Chat.md")
              end
 
