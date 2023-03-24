@@ -106,7 +106,7 @@ module Rubygpt
                path
              else
                current_time = DateTime.now.strftime("%Y-%m-%d-%H-%M-%S")
-               File.join(default_path, "#{current_time} Chat.md")
+               File.join(default_path, "#{current_time}_Chat.md")
              end
 
       @session = Rubygpt::Session.new_by_format(path, @format)
